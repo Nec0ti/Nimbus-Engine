@@ -35,7 +35,7 @@ namespace NimbusEditor.GameProject
         // TODO: Get the path from the installation location
         private readonly string _templatePath = @"..\..\NimbusEditor\ProjectTemplates";
         private string _projectName = "NewProject";
-        public string projectName
+        public string ProjectName
         {
             get => _projectName;
             set
@@ -43,13 +43,14 @@ namespace NimbusEditor.GameProject
                 if (_projectName != value)
                 {
                     _projectName = value;
-                    OnPropertyChanged(nameof(projectName));
+                    ValidateProjectPath();
+                    OnPropertyChanged(nameof(ProjectName));
                 }
             }
         }
 
         private string _projectPath = $@"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\Nimbus Projects\";
-        public string projectPath
+        public string ProjectPath
         {
             get => _projectPath;
             set
@@ -57,14 +58,121 @@ namespace NimbusEditor.GameProject
                 if (_projectPath != value)
                 {
                     _projectPath = value;
-                    OnPropertyChanged(nameof(projectPath));
+                    OnPropertyChanged(nameof(ProjectPath));
                 }
             }
         }
 
+
+        private bool _isValid;
+
+        public bool IsValid
+        {
+            get => _isValid;
+            set
+            {
+                if (_isValid != value)
+                {
+                    _isValid = value;
+                    OnPropertyChanged(nameof(IsValid));
+                }
+            }
+        }
+
+        private string _errorMsg;
+        public string ErrorMsg
+        {
+            get => _errorMsg;
+            set
+            {
+                if (_errorMsg != value)
+                {
+                    _errorMsg = value;
+                    OnPropertyChanged(nameof(ErrorMsg));
+                }
+            }
+        }
+
+
         private ObservableCollection<ProjectTemplate> _projectTemplates = new ObservableCollection<ProjectTemplate>();
         public ReadOnlyObservableCollection<ProjectTemplate> ProjectTemplates
         { get; }
+
+        private bool ValidateProjectPath()
+        {
+            var path = ProjectPath;
+            if (!Path.EndsInDirectorySeparator(path)) path += @"\";
+            path += $@"{ProjectName}\";
+
+            IsValid = false;
+            if (string.IsNullOrWhiteSpace(ProjectName.Trim()))
+            {
+                ErrorMsg = "Project name cannot be empty";
+                return false;
+            }
+            else if (ProjectName.IndexOfAny(Path.GetInvalidFileNameChars()) != -1)
+            {
+                ErrorMsg = "Project name contains invalid characters";
+            }
+            else if (string.IsNullOrWhiteSpace(ProjectPath.Trim()))
+            {
+                ErrorMsg = "Project path cannot be empty";
+            }
+            else if (ProjectPath.IndexOfAny(Path.GetInvalidPathChars()) != -1)
+            {
+                ErrorMsg = "Project path contains invalid characters";
+            }
+            else if (Directory.Exists(path) && Directory.EnumerateFileSystemEntries(path).Any())
+            {
+                ErrorMsg = "Project already exists";
+            }
+            else
+            {
+                IsValid = true;
+                ErrorMsg = string.Empty;
+            }
+
+            return IsValid;
+        }
+
+        public string CreateProject(ProjectTemplate template)
+        {
+            ValidateProjectPath();
+            if (!IsValid)
+            {
+                return string.Empty;
+            }
+
+            if (!Path.EndsInDirectorySeparator(ProjectPath)) ProjectPath += @"\";
+            var path = $@"{ProjectPath}{ProjectName}\";
+
+            try
+            {
+                if (!Directory.Exists(path)) Directory.CreateDirectory(path);
+                foreach (var folder in template.Folders)
+                {
+                    Directory.CreateDirectory(Path.GetFullPath(Path.Combine(Path.GetDirectoryName(path), folder)));
+                }
+                var dirInfo = new DirectoryInfo(path + @".Nimbus\");
+                dirInfo.Attributes |= FileAttributes.Hidden;
+                File.Copy(template.IconFilePath, Path.GetFullPath(Path.Combine(dirInfo.FullName, "Icon.png")));
+                File.Copy(template.ScreenshotFilePath, Path.GetFullPath(Path.Combine(dirInfo.FullName, "Screenshot.png")));
+
+                var projectXml = File.ReadAllText(template.ProjectFilePath);
+                projectXml = string.Format(projectXml, ProjectName, ProjectPath);
+                var projectPath = Path.GetFullPath(Path.Combine(path, $"{ProjectName}{Project.Extension}"));
+                File.WriteAllText(projectPath, projectXml);
+                /*var project = new Project(ProjectName, path);
+                Serializer.ToFile(project, path + $"{ProjectName}" + Project.Extension);*/
+                return path;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                // TODO: log error
+                return string.Empty;
+            }
+        }
 
         public NewProject()
         {
@@ -92,6 +200,7 @@ namespace NimbusEditor.GameProject
 
                     Serializer.ToFile(template, file);*/
                 }
+                ValidateProjectPath();
             }
             catch (Exception ex)
             {
