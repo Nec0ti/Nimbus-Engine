@@ -35,7 +35,11 @@
         </StackPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5,0,0">
             <TextBlock Text="Path" Width="50" />
+<<<<<<< HEAD
             <TextBox Width="500" Text="{Binding ProjectPath, UpdateSourceTrigger=PropertyChanged}"/>
+=======
+            <TextBox Width="500" Text="{Binding projectPath}"/>
+>>>>>>> de2de5ff0d7128bde43e74c2c31eaf37568fd775
             <Button Content="Browse" Width="45" Margin="5,0,0,0"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,30,0,0">
