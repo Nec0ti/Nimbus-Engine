@@ -1,0 +1,93 @@
+### C / C++ derleme çıktıları ###
+*.o
+*.obj
+*.so
+*.so.*
+*.a
+*.out
+*.exe
+*.dll
+*.dylib
+*.lib
+*.pdb
+
+# Derleme geçici dosyaları
+*.d
+*.mod
+*.gch
+
+### CMake ###
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+Testing/
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+
+### Qt ###
+*.qmake.stash
+*.pro.user*
+*.pro.user
+*.moc
+moc_*.cpp
+qrc_*.cpp
+ui_*.h
+*.qmlc
+*.jsc
+*.qm
+*.qrc.dep
+*.qtds
+
+# Qt Creator build dizinleri
+build-*/
+build/
+*.autosave
+
+### VS Code ###
+.vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+### Linux / Arch Linux ###
+*~
+*.swp
+*.swo
+*.tmp
+*.temp
+*.log
+*.lock
+
+# KDE/GNOME dosya yöneticisi
+.DS_Store
+.directory
+.Trash-*
+.nfs*
+
+# Arch Linux package build files (PKGBUILD artıkları)
+pkg/
+src/
+*.pkg.tar.*
+*.tar.zst
+
+### Genel ###
+# Yedek dosyalar
+*.bak
+*.old
+*.orig
+
+# Çekirdek / dump
+core
+*.core
+
+# Diğer IDE/Editor dosyaları
+.idea/
+*.iml
+*.user
+*.userprefs
+
